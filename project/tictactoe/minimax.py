@@ -26,7 +26,7 @@ class TTT_MinimaxPlayer(Player):
         :param player_letter: value representing the player
         :return: [row, col, best_score] of the selected move
         """
-        ######### YOUR CODE HERE #########
+
         best = [None, None, -math.inf]
         if player_letter == 'O':
             best = [None, None, math.inf]
@@ -48,7 +48,7 @@ class TTT_MinimaxPlayer(Player):
             else:
                 if score[2] < best[2]:
                     best = score 
-        ######### YOUR CODE HERE #########
+    
         return best
     
     def evaluate(self, game: TicTacToe) -> int:
@@ -58,14 +58,14 @@ class TTT_MinimaxPlayer(Player):
         :return: the score of the board from the perspective of current player
         """
         score = 0
-        ######### YOUR CODE HERE #########
+        
         if game.wins('X'):
             score = 1
         elif game.wins('O'):
             score = -1
         else:
             score = 0
-        ######### YOUR CODE HERE #########
+            
         return score
     
     def __str__(self) -> str:

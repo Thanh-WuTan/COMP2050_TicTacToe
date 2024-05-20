@@ -32,8 +32,6 @@ class TTT_AlphaBetaPlayer(Player):
         :param beta: best value that the minimizer can guarantee
         :return: (row, col) of the selected move
         """ 
-        ######### YOUR CODE HERE #########
-
         if depth == 0 or game.game_over():
             return [None, None, self.evaluate(game)]
         best = [None, None]
@@ -55,8 +53,6 @@ class TTT_AlphaBetaPlayer(Player):
                 if score[2] < beta:
                     beta = score[2]
                     best = [x, y]
-        
-        ######### YOUR CODE HERE #########
         if player_letter == 'X':
             return [best[0], best[1], alpha]
         else:
@@ -69,14 +65,12 @@ class TTT_AlphaBetaPlayer(Player):
         :return: the score of the board from the perspective of current player
         """
         score = 0
-        ######### YOUR CODE HERE #########
         if game.wins('X'):
             score = 1
         elif game.wins('O'):
             score = -1
         else:
             score = 0
-        ######### YOUR CODE HERE #########
         return score
     
     def __str__(self) -> str:
