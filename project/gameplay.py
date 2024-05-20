@@ -1,7 +1,5 @@
 """
 This module contains the GamePlay class which is responsible for running the game between two players.
-* You don't need to read/understand the code.
-! The code should not be modified. 
 """
 import time
 import threading
