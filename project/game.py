@@ -1,7 +1,5 @@
 """
-This module contains the game logic for Tic Tac Toe and Gomoku. 
-* You may need to understand the code to implement your own players. 
-! The code should not be modified.
+This module contains the game logic for Tic Tac Toe
 """
 from typing import List, Optional
 from abc import ABC, abstractmethod
