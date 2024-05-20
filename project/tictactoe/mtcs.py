@@ -1,9 +1,3 @@
-"""
-TODO: Implement the TreeNode for TTT_MTCSPlayer class.
-* Note 1: You should read the game logic in project/game.py to familiarize yourself with the environment.
-* Note 2: You don't have to strictly follow the template or even use it at all. Feel free to create your own implementation.
-"""
-
 import numpy as np
 import random
 import math
