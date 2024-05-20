@@ -35,14 +35,36 @@ class TTT_AlphaBetaPlayer(Player):
         :param alpha: best value that the maximizer can guarantee
         :param beta: best value that the minimizer can guarantee
         :return: (row, col) of the selected move
-        """
-        best = None
+        """ 
         ######### YOUR CODE HERE #########
-        
-        
+
+        if depth == 0 or game.game_over():
+            return [None, None, self.evaluate(game)]
+        best = [None, None]
+        for empty_cell in game.empty_cells(state=game.board_state):
+            x, y = empty_cell[0], empty_cell[1]
+            newgame = game.copy()
+            newgame.curr_player = player_letter
+            newgame.set_move(x, y, player_letter)
+            new_player_letter = 'X'
+            if player_letter == 'X':
+                new_player_letter = 'O'
+            score = self.minimax(newgame, depth - 1, new_player_letter, alpha, beta)
+            score[0], score[1] = x, y
+            if player_letter == 'X':
+                if score[2] > alpha:
+                    alpha = score[2]
+                    best = [x, y]
+            else:
+                if score[2] < beta:
+                    beta = score[2]
+                    best = [x, y]
         
         ######### YOUR CODE HERE #########
-        return best
+        if player_letter == 'X':
+            return [best[0], best[1], alpha]
+        else:
+            return [best[0], best[1], beta]
     
     def evaluate(self, game: TicTacToe) -> int:
         """
@@ -52,7 +74,12 @@ class TTT_AlphaBetaPlayer(Player):
         """
         score = 0
         ######### YOUR CODE HERE #########
-       
+        if game.wins('X'):
+            score = 1
+        elif game.wins('O'):
+            score = -1
+        else:
+            score = 0
         ######### YOUR CODE HERE #########
         return score
     
