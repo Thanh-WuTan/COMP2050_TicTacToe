@@ -1,7 +1,3 @@
-"""
-TODO: Implement the AlphaBetaPlayer class. The only difference from Minima is the addition of alpha-beta pruning.
-* Note: You should read the game logic in project/game.py to familiarize yourself with the environment.
-"""
 import random
 import math
 from ..player import Player
