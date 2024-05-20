@@ -5,6 +5,8 @@ import math
 from ..player import Player
 from ..game import TicTacToe
 
+from copy import deepcopy
+
 WIN = 1
 LOSE = -1
 DRAW = 0
@@ -18,54 +20,81 @@ class TreeNode():
         self.parent_action = parent_action
         self.children = []
         self.N = 0
-        self.Q = 0
+        self.Q = 0 
     
     def select(self) -> 'TreeNode':
         """
         Select the best child node based on UCB1 formula. Keep selecting until a leaf node is reached.
         """
-        leaf_node = None
-        ######### YOUR CODE HERE #########
-        
-
-        
-        ######### YOUR CODE HERE #########
-        return leaf_node
+        while True:
+            if self.is_leaf_node():
+                return self
+            children = self.children
+            max_ucb = -math.inf
+            for child in children:
+                if child.ucb() > max_ucb:
+                    max_ucb = child.ucb()
+                    self = child       
     
     def expand(self) -> 'TreeNode':
         """
         Expand the current node by adding all possible child nodes. Return one of the child nodes for simulation.
         """
-        child_node = None
-        ######### YOUR CODE HERE #########
+        empty_cells = self.game_state.empty_cells()
+        next_player = 'X'
+        if self.player == 'X':
+            next_player = 'O'
         
+        for empty_cell in empty_cells:
+            x, y = empty_cell[0], empty_cell[1]
+            new_game_state = deepcopy(self.game_state)
+            new_game_state.curr_player = next_player 
+            new_game_state.set_move(x, y, next_player)
+            child = TreeNode(game_state=new_game_state, player_letter=next_player, parent=self, parent_action=[x, y])
+            self.children.append(child)
 
-        
-        ######### YOUR CODE HERE #########
-        return child_node
+        rand_idx = random.randint(0, len(self.children) - 1)
+        return self.children[rand_idx]
     
     def simulate(self) -> int:
         """
         Run simulation from the current node until the game is over. Return the result of the simulation.
         """
-        result = 0
-        ######### YOUR CODE HERE #########
-        
-
-        
-        ######### YOUR CODE HERE #########
-        return result
-    
-    def backpropagate(self, result: int):
+        game_state = deepcopy(self.game_state)
+        player = deepcopy(self.player)
+        while True:
+            if game_state.game_over():
+                if game_state.wins('X'):
+                    return 'X'
+                if game_state.wins('O'):
+                    return 'O'
+                return None
+            if player == 'X':
+                player = 'O'
+            else:
+                player = 'X'
+            empty_cells = game_state.empty_cells()
+            rand_idx = random.randint(0, len(empty_cells) - 1)
+            action = empty_cells[rand_idx]
+            x, y = action[0], action[1]
+            game_state.set_move(x, y, player)
+            
+    def backpropagate(self, winner: int):
         """
         Backpropagate the result of the simulation to the root node.
         """
-        ######### YOUR CODE HERE #########
-        
+        cur_node = self
+        while True:
+            cur_node.N+= 1
+            if winner != None:
+                if cur_node.player == winner:
+                    cur_node.Q+= 1
+            if cur_node.parent == None:
+                break
+            else:
+                cur_node = cur_node.parent
+    
 
-        
-        ######### YOUR CODE HERE #########
-            
     def is_leaf_node(self) -> bool:
         return len(self.children) == 0
     
@@ -90,11 +119,12 @@ class TTT_MCTSPlayer(Player):
         for _ in range(self.num_simulations):
             leaf = mcts.select()
             if not leaf.is_terminal_node():
-                leaf.expand()
-            # Default simulation starts from an expanded node of leaf. However, we can also start simulation from leaf itself to avoid complicating the code.
-            result = leaf.simulate() 
-            leaf.backpropagate(-result) # Negate the result because it's from the perspective of the opponent
-            
+                chose_node = leaf.expand()
+            else:
+                chose_node = leaf
+            winner = chose_node.simulate() 
+            chose_node.backpropagate(winner) 
+     
         best_child = max(mcts.children, key=lambda c: c.N)
         return best_child.parent_action
     

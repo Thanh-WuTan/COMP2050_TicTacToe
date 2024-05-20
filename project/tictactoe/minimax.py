@@ -26,7 +26,6 @@ class TTT_MinimaxPlayer(Player):
         :param player_letter: value representing the player
         :return: [row, col, best_score] of the selected move
         """
-
         best = [None, None, -math.inf]
         if player_letter == 'O':
             best = [None, None, math.inf]
