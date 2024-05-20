@@ -32,9 +32,29 @@ class TTT_MinimaxPlayer(Player):
         :param player_letter: value representing the player
         :return: [row, col, best_score] of the selected move
         """
-        best = [None, None, None]
         ######### YOUR CODE HERE #########
-        
+        best = [None, None, -math.inf]
+        if player_letter == 'O':
+            best = [None, None, math.inf]
+        if depth == 0 or game.game_over():
+            return [best[0], best[1], self.evaluate(game)]
+        for empty_cell in game.empty_cells(state=game.board_state):
+            x, y = empty_cell[0], empty_cell[1]
+            newgame = game.copy()
+            newgame.curr_player = player_letter
+            newgame.set_move(x, y, player_letter)
+            new_player_letter = 'X'
+            if player_letter == 'X':
+                new_player_letter = 'O'
+            score = self.minimax(newgame, depth - 1, new_player_letter)
+            score[0], score[1] = x, y
+            if player_letter == 'X':
+                if score[2] > best[2]:
+                    best = score
+            else:
+                if score[2] < best[2]:
+                    best = score 
+        ######### YOUR CODE HERE #########
         return best
     
     def evaluate(self, game: TicTacToe) -> int:
@@ -45,7 +65,12 @@ class TTT_MinimaxPlayer(Player):
         """
         score = 0
         ######### YOUR CODE HERE #########
-        
+        if game.wins('X'):
+            score = 1
+        elif game.wins('O'):
+            score = -1
+        else:
+            score = 0
         ######### YOUR CODE HERE #########
         return score
     
