@@ -26,22 +26,19 @@ class TreeNode():
         """
         Select the best child node based on UCB1 formula. Keep selecting until a leaf node is reached.
         """
-        while True:
-            if self.is_leaf_node():
-                return self
-            children = self.children
-            max_ucb = -math.inf
-            for child in children:
-                if child.ucb() > max_ucb:
-                    max_ucb = child.ucb()
-                    self = child       
+        if self.is_leaf_node():
+            return self
+        return self.best_child()
     
     def expand(self) -> 'TreeNode':
         """
         Expand the current node by adding all possible child nodes. Return one of the child nodes for simulation.
         """
         empty_cells = self.game_state.empty_cells()
-        next_player = self.game_state.curr_player
+        next_player = 'X'
+        if self.player == 'X':
+            next_player = 'O'
+        
         for empty_cell in empty_cells:
             x, y = empty_cell[0], empty_cell[1]
             new_game_state = deepcopy(self.game_state)
@@ -57,8 +54,8 @@ class TreeNode():
         """
         Run simulation from the current node until the game is over. Return the result of the simulation.
         """
-        game_state = self.game_state.copy()
-        player = self.player
+        game_state = deepcopy(self.game_state)
+        player = deepcopy(self.player)
         while True:
             if game_state.game_over():
                 if game_state.wins('X'):
