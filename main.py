@@ -28,9 +28,9 @@ if __name__ == '__main__':
     game, (x_player, o_player) = Game(game=args.game), Player(player1=args.player1, player2=args.player2)
     
     # Train Q-Learning Player
-    if args.player1 == 'qplayer':
+    if args.player1 == 'qlearning':
         x_player.train(game)
-    if args.player2 == 'qplayer':
+    if args.player2 == 'qlearning':
         o_player.train(game)
     gameplay = GamePlay(x_player=x_player, o_player=o_player, game=game, mode=args.mode, num_games=args.num_games, timeout=timeout)
     gameplay.run()

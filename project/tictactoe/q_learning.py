@@ -9,6 +9,12 @@ from ..game import TicTacToe
 from . import *
 from tqdm import tqdm
 
+import math
+
+from copy import deepcopy
+
+import random
+
 NUM_EPISODES = 100000
 LEARNING_RATE = 0.5
 DISCOUNT_FACTOR = 0.9
@@ -80,11 +86,23 @@ class TTT_QPlayer(Player):
         We need to update the Q-values for each state-action pair in the action history because the reward is only received at the end.
           
         """
-        ######### YOUR CODE HERE #########
+        for pair in self.action_history:
+            state = pair[0]
+            action = pair[1]
+            x, y = action[0], action[1]
+            next_state = ""
+            for p in range(3 * 3):
+                if p == x * 3 + y:
+                    if action[2] == 'O':
+                        next_state+= '2'
+                    elif action[2] == 'X':
+                        next_state+= '1'
+                    else:
+                        assert(False)
+                else:
+                    next_state+= state[p]
+            self.update_q_values(state, x * 3 + y, next_state, reward)
         
-
-        
-        ######### YOUR CODE HERE #########
 
     def choose_action(self, game: TicTacToe) -> Union[List[int], Tuple[int, int]]:
         """
@@ -92,24 +110,53 @@ class TTT_QPlayer(Player):
         if random number < ε, choose random action
         else choose action with the highest Q-value
         """
-        action = None
-        ######### YOUR CODE HERE #########
         
+        rand = random.random()
+        assert(0 <= rand < 1)
 
+        state = self.hash_board(game.board_state)
+        player_letter = game.curr_player
+        if game.curr_player == 'X':
+            player_letter = 'O'
         
-        ######### YOUR CODE HERE #########                                
-        return action
+        empty_cells = game.empty_cells()
+        assert(len(empty_cells) > 0)
+
+        if rand < self.epsilon:
+            rand_idx = random.randint(0, len(empty_cells) - 1)
+            empty_cell = empty_cells[rand_idx]
+            return [empty_cell[0], empty_cell[1], player_letter]
+        else:
+            bestaction = None
+            maxQ = -math.inf
+            
+            for cell in empty_cells:
+                action = cell[0] * 3 + cell[1]
+                if bestaction == None: 
+                    bestaction = [cell[0], cell[1], player_letter]
+                if (state, action) in self.Q:
+                    if self.Q[(state, action)] > maxQ:
+                        maxQ = self.Q[(state, action)]
+                        bestaction = [cell[0], cell[1], player_letter]
+
+            return bestaction
     
     def update_q_values(self, state, action, next_state, reward):
         """
         Given (s, a, s', r), update the Q-value for the state-action pair (s, a) using the Bellman equation:
             Q(s, a) = Q(s, a) + alpha * (reward + gamma * max(Q(s', a')) - Q(s, a))
         """
-        ######### YOUR CODE HERE #########
-        
-
-        
-        ######### YOUR CODE HERE #########  
+        maxQ = -math.inf
+        for x in range(3):
+            for y in range(3):
+                if next_state[x * 3 + y] != '0':
+                    continue
+                n_action = x * 3 + y
+                if (next_state, n_action) in self.Q:
+                    maxQ = max(maxQ, self.Q[(next_state, n_action)])
+        if (state, action) not in self.Q:
+            self.Q[(state, action)] = 0
+        self.Q[(state, action)] = self.Q[(state, action)] + self.learning_rate * (reward + self.gamma * maxQ - self.Q[(state, action)])
     
     def hash_board(self, board):
         key = ''
@@ -125,11 +172,9 @@ class TTT_QPlayer(Player):
 
     def get_move(self, game: TicTacToe):
         self.epsilon = 0 # No exploration 
-        move = self.choose_action(game)
+        choice = self.choose_action(game)
+        move = [choice[0], choice[1]]
         return move
     
     def __str__(self):
-        return "Q-Learning Player"
-    
-    
-    
+        return "qplayer"

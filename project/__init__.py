@@ -20,7 +20,7 @@ def Player(player1, player2):
         x_player = TTT_AlphaBetaPlayer('X')
     elif player1 == 'mcts':
         x_player = TTT_MCTSPlayer('X')
-    elif player1 == 'qplayer':
+    elif player1 == 'qlearning':
         x_player = TTT_QPlayer('X')
     else:
         raise ValueError(f"Player 1 {player1} is not defined.")
@@ -35,7 +35,7 @@ def Player(player1, player2):
         o_player = TTT_AlphaBetaPlayer('O')
     elif player2 == 'mcts':
         o_player = TTT_MCTSPlayer('O')
-    elif player2 == 'qplayer':
+    elif player2 == 'qlearning':
         o_player = TTT_QPlayer('O')
     else:
         raise ValueError(f"Player 2 {player2} is not defined.")
