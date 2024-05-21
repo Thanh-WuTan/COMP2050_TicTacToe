@@ -4,7 +4,6 @@ import math
 
 from ..player import Player
 from ..game import TicTacToe
-from . import TTT_MinimaxPlayer
 
 from copy import deepcopy
 
@@ -42,10 +41,7 @@ class TreeNode():
         Expand the current node by adding all possible child nodes. Return one of the child nodes for simulation.
         """
         empty_cells = self.game_state.empty_cells()
-        next_player = 'X'
-        if self.player == 'X':
-            next_player = 'O'
-        
+        next_player = self.game_state.curr_player
         for empty_cell in empty_cells:
             x, y = empty_cell[0], empty_cell[1]
             new_game_state = deepcopy(self.game_state)
@@ -62,14 +58,7 @@ class TreeNode():
         Run simulation from the current node until the game is over. Return the result of the simulation.
         """
         game_state = deepcopy(self.game_state)
-        
-        player1_letter = self.player
-        player2_letter = 'X'
-        if player1_letter == 'X':
-            player2_letter = 'O'
-        player1 = TTT_MinimaxPlayer(player1_letter)
-        player2 = TTT_MinimaxPlayer(player2_letter)
-        turn = 2
+        player = deepcopy(self.player)
         while True:
             if game_state.game_over():
                 if game_state.wins('X'):
@@ -77,17 +66,16 @@ class TreeNode():
                 if game_state.wins('O'):
                     return 'O'
                 return None
-            if turn == 1:
-                move = player1.get_move(game_state)
-                game_state.set_move(move[0], move[1], player1.letter)
-                turn = 2
-            elif turn == 2:
-                move = player2.get_move(game_state)
-                game_state.set_move(move[0], move[1], player2.letter)
-                turn = 1
+            if player == 'X':
+                player = 'O'
             else:
-                assert(False)
-                        
+                player = 'X'
+            empty_cells = game_state.empty_cells()
+            rand_idx = random.randint(0, len(empty_cells) - 1)
+            action = empty_cells[rand_idx]
+            x, y = action[0], action[1]
+            game_state.set_move(x, y, player)
+            
     def backpropagate(self, winner: int):
         """
         Backpropagate the result of the simulation to the root node.
