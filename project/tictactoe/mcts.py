@@ -57,7 +57,7 @@ class TreeNode():
         """
         Run simulation from the current node until the game is over. Return the result of the simulation.
         """
-        game_state = deepcopy(self.game_state)
+        game_state = self.game_state.copy()
         player = deepcopy(self.player)
         while True:
             if game_state.game_over():
