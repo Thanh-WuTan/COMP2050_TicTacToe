@@ -91,14 +91,12 @@ class TTT_QPlayer(Player):
             action = pair[1]
             x, y = action[0], action[1]
             next_state = ""
-            for p in range(3 * 3):
+            for p in range(len(state)):
                 if p == x * 3 + y:
                     if action[2] == 'O':
                         next_state+= '2'
                     elif action[2] == 'X':
                         next_state+= '1'
-                    else:
-                        assert(False)
                 else:
                     next_state+= state[p]
             self.update_q_values(state, x * 3 + y, next_state, reward)
@@ -177,4 +175,4 @@ class TTT_QPlayer(Player):
         return move
     
     def __str__(self):
-        return "qplayer"
+        return "Q-learning player"

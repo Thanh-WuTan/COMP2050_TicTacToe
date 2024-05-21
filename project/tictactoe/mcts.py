@@ -77,16 +77,13 @@ class TreeNode():
         """
         Backpropagate the result of the simulation to the root node.
         """
-        cur_node = self
-        while True:
-            cur_node.N+= 1
-            if winner != None:
-                if cur_node.player == winner:
-                    cur_node.Q+= 1
-            if cur_node.parent == None:
-                break
-            else:
-                cur_node = cur_node.parent
+        self.N+= 1
+        if winner != None:
+            if self.player == winner:
+                self.Q+= 1
+        if self.parent:
+            self.parent.backpropagate(winner)
+     
     
 
     def is_leaf_node(self) -> bool:
