@@ -28,34 +28,29 @@ class TreeNode():
         """
         if self.is_leaf_node():
             return self
-        return self.best_child()
+        return self.best_child().select()
     
     def expand(self) -> 'TreeNode':
         """
-        Expand the current node by adding all possible child nodes. Return one of the child nodes for simulation.
+        Expand the current node by adding all possible child nodes.
         """
-        empty_cells = self.game_state.empty_cells()
-        next_player = 'X'
-        if self.player == 'X':
-            next_player = 'O'
-        
-        for empty_cell in empty_cells:
-            x, y = empty_cell[0], empty_cell[1]
-            new_game_state = deepcopy(self.game_state)
-            new_game_state.curr_player = next_player 
-            new_game_state.set_move(x, y, next_player)
-            child = TreeNode(game_state=new_game_state, player_letter=next_player, parent=self, parent_action=[x, y])
-            self.children.append(child)
-
+        cur_player = self.game_state.curr_player         
+        next_player = 'X' if cur_player == 'O' else 'O'   
+        for cell in self.game_state.empty_cells():
+            new_game_state = self.game_state.copy()
+            new_game_state.set_move(cell[0], cell[1], cur_player)
+            new_game_state.curr_player = next_player
+            self.children.append(TreeNode(new_game_state, next_player, parent=self, parent_action=cell))
         rand_idx = random.randint(0, len(self.children) - 1)
         return self.children[rand_idx]
     
     def simulate(self) -> int:
         """
         Run simulation from the current node until the game is over. Return the result of the simulation.
-        """
-        game_state = deepcopy(self.game_state)
-        player = deepcopy(self.player)
+        """ 
+        game_state = self.game_state.copy()
+        cur_player = game_state.curr_player
+   
         while True:
             if game_state.game_over():
                 if game_state.wins('X'):
@@ -63,28 +58,20 @@ class TreeNode():
                 if game_state.wins('O'):
                     return 'O'
                 return None
-            if player == 'X':
-                player = 'O'
+            random_move = random.choice(game_state.empty_cells())
+            game_state.set_move(random_move[0], random_move[1], cur_player)
+            if cur_player == 'X':
+                cur_player = 'O'
             else:
-                player = 'X'
-            empty_cells = game_state.empty_cells()
-            rand_idx = random.randint(0, len(empty_cells) - 1)
-            action = empty_cells[rand_idx]
-            x, y = action[0], action[1]
-            game_state.set_move(x, y, player)
-            
-    def backpropagate(self, winner: int):
+                cur_player = 'X'
+    def backpropagate(self, winner):
         """
         Backpropagate the result of the simulation to the root node.
         """
         self.N+= 1
-        if winner != None:
-            if self.player == winner:
-                self.Q+= 1
-        if self.parent:
+        self.Q+= 1 if self.player != winner else 0
+        if self.parent is not None:
             self.parent.backpropagate(winner)
-     
-    
 
     def is_leaf_node(self) -> bool:
         return len(self.children) == 0
@@ -107,15 +94,15 @@ class TTT_MCTSPlayer(Player):
     
     def get_move(self, game):
         mcts = TreeNode(game, self.letter)
+        
         for _ in range(self.num_simulations):
             leaf = mcts.select()
+            chose_node = leaf
             if not leaf.is_terminal_node():
                 chose_node = leaf.expand()
-            else:
-                chose_node = leaf
             winner = chose_node.simulate() 
             chose_node.backpropagate(winner) 
-     
+        
         best_child = max(mcts.children, key=lambda c: c.N)
         return best_child.parent_action
     
