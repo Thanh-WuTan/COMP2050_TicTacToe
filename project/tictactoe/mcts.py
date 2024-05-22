@@ -70,7 +70,7 @@ class TreeNode():
         """
         self.N+= 1
         self.Q+= 1 if self.player != winner else 0
-        if self.parent is not None:
+        if self.parent != None:
             self.parent.backpropagate(winner)
 
     def is_leaf_node(self) -> bool:
